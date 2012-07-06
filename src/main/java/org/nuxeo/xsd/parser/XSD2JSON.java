@@ -68,11 +68,15 @@ public class XSD2JSON {
             if (field.getType().isListType()) {
                 ListType lt = (ListType) field.getType();
                 if (lt.getFieldType().isComplexType()) {
-                    JSONObject cplx = new JSONObject();
-                    cplx.put("type", "complex[]");
-                    JSONObject fields = buildComplexFields(lt.getField());
-                    cplx.put("fields", fields);
-                    object.put(field.getName().getLocalName(), cplx);
+                    if (lt.getFieldType().getName().equals("content")) {
+                        object.put(field.getName().getLocalName(), "blob[]");
+                    } else {
+                        JSONObject cplx = new JSONObject();
+                        cplx.put("type", "complex[]");
+                        JSONObject fields = buildComplexFields(lt.getField());
+                        cplx.put("fields", fields);
+                        object.put(field.getName().getLocalName(), cplx);
+                    }
                 } else {
                     object.put(field.getName().getLocalName(),
                             lt.getFieldType().getName() + "[]");
@@ -82,12 +86,15 @@ public class XSD2JSON {
                         field.getType().getName());
             }
         } else {
-            JSONObject cplx = new JSONObject();
-            cplx.put("type", "complex");
-            JSONObject fields = buildComplexFields(field);
-            cplx.put("fields", fields);
-
-            object.put(field.getName().getLocalName(), cplx);
+            if (field.getType().getName().equals("content")) {
+                object.put(field.getName().getLocalName(), "blob");
+            } else {
+                JSONObject cplx = new JSONObject();
+                cplx.put("type", "complex");
+                JSONObject fields = buildComplexFields(field);
+                cplx.put("fields", fields);
+                object.put(field.getName().getLocalName(), cplx);
+            }
         }
     }
 
