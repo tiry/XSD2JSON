@@ -1,6 +1,8 @@
 package org.nuxeo.xsd.parser;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +17,9 @@ import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.util.SimpleRuntime;
 
 public class XSD2JSON {
+
+    public final static List<String> supportedScalarTypes = Arrays.asList(
+            "string", "date", "boolean", "integer", "double");
 
     public static String asJSON(String name, String prefix, File xsdFile)
             throws Exception {
@@ -62,6 +67,13 @@ public class XSD2JSON {
         return rootObject.toString(2);
     }
 
+    protected static String getFiltredScalarType(String type) {
+        if (supportedScalarTypes.contains(type)) {
+            return type;
+        }
+        return "string";
+    }
+
     protected static void addField(JSONObject object, Field field)
             throws JSONException {
         if (!field.getType().isComplexType()) {
@@ -79,11 +91,12 @@ public class XSD2JSON {
                     }
                 } else {
                     object.put(field.getName().getLocalName(),
-                            lt.getFieldType().getName() + "[]");
+                            getFiltredScalarType(lt.getFieldType().getName())
+                                    + "[]");
                 }
             } else {
                 object.put(field.getName().getLocalName(),
-                        field.getType().getName());
+                        getFiltredScalarType(field.getType().getName()));
             }
         } else {
             if (field.getType().getName().equals("content")) {
