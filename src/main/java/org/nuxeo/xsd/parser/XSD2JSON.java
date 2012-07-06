@@ -33,9 +33,10 @@ public class XSD2JSON {
     protected static Schema loadSchema(String name, String prefix, File xsdFile)
             throws Exception {
         if (!Framework.isInitialized()) {
-          RuntimeService runtime = new SimpleRuntime();
-          System.setProperty("nuxeo.home", System.getProperty("java.io.tmpdir"));
-          Framework.initialize(runtime);
+            RuntimeService runtime = new SimpleRuntime();
+            System.setProperty("nuxeo.home",
+                    System.getProperty("java.io.tmpdir"));
+            Framework.initialize(runtime);
         }
         SchemaManagerImpl schemaManager = new SchemaManagerImpl();
         XSDLoader loader = new XSDLoader(schemaManager);
@@ -45,12 +46,20 @@ public class XSD2JSON {
 
     public static String asJSON(Schema schema) throws JSONException {
 
-        JSONObject root = new JSONObject();
-        root.put("@prefix", schema.getNamespace().prefix);
+        JSONObject schemaObject = new JSONObject();
+
+        schemaObject.put("@prefix", schema.getNamespace().prefix);
         for (Field field : schema.getFields()) {
-            addField(root, field);
+            addField(schemaObject, field);
         }
-        return schema.getName() + root.toString(1);
+
+        JSONObject schemasObject = new JSONObject();
+        schemasObject.put(schema.getName(), schemaObject);
+
+        JSONObject rootObject = new JSONObject();
+
+        rootObject.put("schemas", schemasObject);
+        return rootObject.toString(2);
     }
 
     protected static void addField(JSONObject object, Field field)
