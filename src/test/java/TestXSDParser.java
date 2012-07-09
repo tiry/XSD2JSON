@@ -2,6 +2,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.nuxeo.xsd.parser.XSD2JSON;
@@ -13,7 +15,8 @@ public class TestXSDParser {
         URL url = this.getClass().getClassLoader().getResource("dublincore.xsd");
         File xsdFile = new File(url.toURI());
         assertNotNull(xsdFile);
-        System.out.println(XSD2JSON.asJSON("dublincore", "dc", xsdFile));
+        System.out.println(XSD2JSON.asJSON("dublincore", "dc", xsdFile, null,
+                null, null));
     }
 
     @Test
@@ -22,7 +25,8 @@ public class TestXSDParser {
                 "complexschema.xsd");
         File xsdFile = new File(url.toURI());
         assertNotNull(xsdFile);
-        System.out.println(XSD2JSON.asJSON("complex", "cplx", xsdFile));
+        System.out.println(XSD2JSON.asJSON("complex", "cplx", xsdFile, null,
+                null, null));
     }
 
     @Test
@@ -30,7 +34,7 @@ public class TestXSDParser {
         URL url = this.getClass().getClassLoader().getResource("TestSchema.xsd");
         File xsdFile = new File(url.toURI());
         assertNotNull(xsdFile);
-        System.out.println(XSD2JSON.asJSON("test", "tst", xsdFile));
+        System.out.println(XSD2JSON.asJSON("test", "tst", xsdFile, null, null,
+                null));
     }
-
 }
