@@ -175,6 +175,9 @@ public class XSD2JSON {
         if (supportedScalarTypes.contains(type)) {
             return type;
         }
+        if ("long".equalsIgnoreCase(type)) {
+            return "integer";
+        }
         return "string";
     }
 
