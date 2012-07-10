@@ -28,6 +28,8 @@ public class XSD2JSON {
     public final static List<String> supportedScalarTypes = Arrays.asList(
             "string", "date", "boolean", "integer", "double");
 
+    public final static List<String> restrictedFieldNames = Arrays.asList("id");
+
     public static GenerationResult asJSON(String name, String prefix,
             String xsdFileLocation, List<String> subFields2Extract,
             String subName, String subPrefix) throws Exception {
@@ -181,6 +183,14 @@ public class XSD2JSON {
         return "string";
     }
 
+    protected static boolean isValidFieldName(String name) {
+        if (restrictedFieldNames.contains(name)) {
+            System.out.println("### Skiping field with name " + name);
+            return false;
+        }
+        return true;
+    }
+
     protected static void addField(JSONObject object, Field field)
             throws JSONException {
 
@@ -189,32 +199,45 @@ public class XSD2JSON {
                 ListType lt = (ListType) field.getType();
                 if (lt.getFieldType().isComplexType()) {
                     if (lt.getFieldType().getName().equals("content")) {
-                        object.put(field.getName().getLocalName(), "blob[]");
+                        if (isValidFieldName(field.getName().getLocalName())) {
+                            object.put(field.getName().getLocalName(), "blob[]");
+                        }
                     } else {
                         JSONObject cplx = new JSONObject();
                         cplx.put("type", "complex[]");
                         JSONObject fields = buildComplexFields(lt.getField());
                         cplx.put("fields", fields);
-                        object.put(field.getName().getLocalName(), cplx);
+                        if (isValidFieldName(field.getName().getLocalName())) {
+                            object.put(field.getName().getLocalName(), cplx);
+                        }
                     }
                 } else {
-                    object.put(field.getName().getLocalName(),
-                            getFiltredScalarType(lt.getFieldType().getName())
-                                    + "[]");
+                    if (isValidFieldName(field.getName().getLocalName())) {
+                        object.put(
+                                field.getName().getLocalName(),
+                                getFiltredScalarType(lt.getFieldType().getName())
+                                        + "[]");
+                    }
                 }
             } else {
-                object.put(field.getName().getLocalName(),
-                        getFiltredScalarType(field.getType().getName()));
+                if (isValidFieldName(field.getName().getLocalName())) {
+                    object.put(field.getName().getLocalName(),
+                            getFiltredScalarType(field.getType().getName()));
+                }
             }
         } else {
             if (field.getType().getName().equals("content")) {
-                object.put(field.getName().getLocalName(), "blob");
+                if (isValidFieldName(field.getName().getLocalName())) {
+                    object.put(field.getName().getLocalName(), "blob");
+                }
             } else {
                 JSONObject cplx = new JSONObject();
                 cplx.put("type", "complex");
                 JSONObject fields = buildComplexFields(field);
                 cplx.put("fields", fields);
-                object.put(field.getName().getLocalName(), cplx);
+                if (isValidFieldName(field.getName().getLocalName())) {
+                    object.put(field.getName().getLocalName(), cplx);
+                }
             }
         }
     }
